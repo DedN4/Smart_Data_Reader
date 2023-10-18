@@ -1,6 +1,6 @@
 import sys
 import pandas as pd
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, QWidget, QDockWidget, QToolButton, QMenu, QTableWidget, QTableWidgetItem, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, QWidget, QDockWidget, QToolButton, QMenu, QTableWidget, QTableWidgetItem, QAction, QMenuBar
 from datetime import datetime
 
 class AnalisadorXLSX(QMainWindow):
@@ -9,7 +9,7 @@ class AnalisadorXLSX(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("LID - Leitor Inteligente de Dados")
+        self.setWindowTitle("SDR - Smart Data Reader")
         self.setGeometry(100, 100, 800, 600)
 
         # Crie um widget central para organizar a interface
@@ -20,10 +20,24 @@ class AnalisadorXLSX(QMainWindow):
         layout = QVBoxLayout(central_widget)
         central_widget.setLayout(layout)
 
-        # Botão para importar arquivo XLSX
-        self.btnAbrirArquivo = QPushButton("Importar Dados", self)
-        self.btnAbrirArquivo.clicked.connect(self.abrirArquivo)
-        layout.addWidget(self.btnAbrirArquivo)
+        # Adicione a barra de menu
+        menubar = self.menuBar()
+
+        # Crie o menu "Arquivo"
+        arquivo_menu = menubar.addMenu("Arquivo")
+
+        # Opção para importar arquivo XLSX
+        importar_action = QAction("Importar Dados", self)
+        importar_action.triggered.connect(self.abrirArquivo)
+        arquivo_menu.addAction(importar_action)
+
+        # Crie o menu "Análise"
+        analise_menu = menubar.addMenu("Análise")
+
+        # Opção para análise específica
+        analise_action = QAction("Análise Específica", self)
+        analise_action.triggered.connect(self.analiseEspecifica)
+        analise_menu.addAction(analise_action)
 
         # Área para exibir estatísticas gerais
         self.textBrowser = QTextBrowser(self)
@@ -116,6 +130,11 @@ class AnalisadorXLSX(QMainWindow):
                 for col in range(self.df_original.shape[1]):
                     item = QTableWidgetItem(str(self.df_original.iloc[row, col]))
                     self.visualizacao_widget.setItem(row, col, item)
+
+    def analiseEspecifica(self):
+        # Adicione sua lógica para análise específica aqui
+        self.textBrowser.clear()
+        self.textBrowser.append("Executando análise específica...")
 
 def main():
     app = QApplication(sys.argv)
