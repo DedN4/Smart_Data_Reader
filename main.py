@@ -107,9 +107,11 @@ class AnalisadorXLSX(QMainWindow):
     def abrirArquivo(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        filepath, _ = QFileDialog.getOpenFileName(self, "Abrir Arquivo XLSX", "", "Arquivos XLSX (*.xlsx);;Todos os Arquivos (*)", options=options)
+        filepath, _ = QFileDialog.getOpenFileName(self, "Abrir Arquivo XLSX", "",
+                                                  "Arquivos XLSX (*.xlsx);;Todos os Arquivos (*)", options=options)
 
         if filepath:
+            self.limparDadosAnteriores()  # Limpar dados anteriores
             self.log(f"Arquivo importado: {filepath}")
             df = pd.read_excel(filepath)
             self.df_original = df
@@ -132,8 +134,12 @@ class AnalisadorXLSX(QMainWindow):
         else:
             self.dock_logs.hide()
 
-
-
+    def limparDadosAnteriores(self):
+        self.df_original = None
+        self.coluna_principal_combobox.clear()
+        self.colunas_operacoes_combobox.clear()
+        self.visualizacao_widget.setRowCount(0)
+        self.visualizacao_widget.setColumnCount(0)
 
     def toggleVisualizacao(self):
         # Exibe ou oculta o dock de visualização de dados com base na ação do menu
