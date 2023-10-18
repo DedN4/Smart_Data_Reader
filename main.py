@@ -26,11 +26,6 @@ class AnalisadorXLSX(QMainWindow):
         # Crie o menu "Análise"
         analise_menu = menubar.addMenu("Análise")
 
-        # Opção para análise específica
-        analise_action = QAction("Análise Específica", self)
-        analise_action.triggered.connect(self.iniciarAnaliseEspecifica)
-        analise_menu.addAction(analise_action)
-
         # Crie um widget central para organizar a interface
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -75,15 +70,6 @@ class AnalisadorXLSX(QMainWindow):
         self.dock_visualizacao.setWidget(self.visualizacao_widget)
         self.addDockWidget(1, self.dock_visualizacao)
         self.dock_visualizacao.hide()
-
-        # Crie um submenu "Preferências" em "Arquivo"
-        preferencias_submenu = arquivo_menu.addMenu("Preferências")
-
-        # Adicione uma ação para mostrar/ocultar logs
-        mostrar_logs_action = QAction("Mostrar/Esconder Logs", self)
-        mostrar_logs_action.setCheckable(True)
-        mostrar_logs_action.toggled.connect(self.toggleLogs)
-        preferencias_submenu.addAction(mostrar_logs_action)
 
         # Crie o menu "Exibir"
         exibir_menu = menubar.addMenu("Exibir")
