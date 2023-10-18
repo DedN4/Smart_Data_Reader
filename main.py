@@ -1,7 +1,10 @@
 import sys
-import pandas as pd
-from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, QWidget, QDockWidget, QTableWidget,QInputDialog, QTableWidgetItem, QMenuBar, QLabel, QComboBox
+import numpy as np  # Importe NumPy
 from datetime import datetime
+import pandas as pd
+from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, \
+    QWidget, QDockWidget, QTableWidget, QInputDialog, QTableWidgetItem, QLabel, QComboBox, QLayout
+
 
 class AnalisadorXLSX(QMainWindow):
     def __init__(self):
@@ -10,7 +13,7 @@ class AnalisadorXLSX(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("SDR - Smart Data Reader")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(0, 0, 1000, 600)
 
         # Crie a barra de menu
         menubar = self.menuBar()
@@ -98,6 +101,28 @@ class AnalisadorXLSX(QMainWindow):
         self.toggle_visualizacao_action.setCheckable(True)
         self.toggle_visualizacao_action.toggled.connect(self.toggleVisualizacao)
 
+        # Layout em grade para organizar a interface
+        layout = QVBoxLayout(central_widget)
+        central_widget.setLayout(layout)
+
+        # Widget para exibir as estatísticas
+        self.resumo_label = QLabel("Estatísticas Gerais:", self)
+        layout.addWidget(self.resumo_label)
+
+        # Área para exibir estatísticas gerais
+        self.textBrowser = QTextBrowser(self)
+        layout.addWidget(self.textBrowser)
+
+        # Widget para exibir informações gerais
+        self.informacoes_gerais_label = QLabel("Informações Gerais:", self)
+        layout.addWidget(self.informacoes_gerais_label)
+
+        # Define as informações gerais iniciais
+        self.informacoes_gerais_label.setText("Nenhum dado carregado.")
+
+        # DataFrame original
+        self.df_original = None
+
     def log(self, entry):
         # Registre uma entrada no widget de logs
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -118,11 +143,10 @@ class AnalisadorXLSX(QMainWindow):
             self.addLogEntry("Arquivo carregado com sucesso.")
             self.displayDataInTable()
 
-        # Preencha os elementos de seleção de coluna com as colunas disponíveis
-        if self.df_original is not None:
-            self.coluna_principal_combobox.addItems(self.df_original.columns)
-            self.colunas_operacoes_combobox.addItems(self.df_original.columns)
-
+            # Atualize as informações gerais com as estatísticas
+            coluna_principal = self.coluna_principal_combobox.currentText()
+            estatisticas = self.calcularEstatisticas(coluna_principal)
+            self.informacoes_gerais_label.setText(estatisticas)
     def addLogEntry(self, entry):
         # Adicione uma entrada ao widget de logs
         self.logs_widget.append(entry)
@@ -148,6 +172,20 @@ class AnalisadorXLSX(QMainWindow):
         else:
             self.dock_visualizacao.hide()
 
+    def calcularEstatisticas(self, coluna_principal):
+        if self.df_original is not None:
+            if coluna_principal in self.df_original.columns:
+                serie = self.df_original[coluna_principal]
+
+                media = np.mean(serie)
+                soma = np.sum(serie)
+                contagem = len(serie)
+
+                return f"Média: {media:.2f}, Soma: {soma}, Contagem: {contagem}"
+            else:
+                return "Coluna principal não encontrada nos dados."
+        else:
+            return "Nenhum dado carregado."
     def displayDataInTable(self):
         # Exiba os dados da planilha na tabela
         if self.df_original is not None:
@@ -173,8 +211,13 @@ class AnalisadorXLSX(QMainWindow):
         coluna_principal = self.coluna_principal_combobox.currentText()
         colunas_operacoes = self.colunas_operacoes_combobox.currentText()
 
-        self.log(f"Iniciou análise com base na coluna principal: {coluna_principal} e coluna(s) de operações: {colunas_operacoes}")
+        self.log(
+            f"Iniciou análise com base na coluna principal: {coluna_principal} e coluna(s) de operações: {colunas_operacoes}")
         self.criarTabelaDinamica(coluna_principal, colunas_operacoes)
+
+        # Atualize o resumo com as estatísticas
+        estatisticas = self.calcularEstatisticas(coluna_principal)
+        self.resumo_label.setText(f"Estatísticas Gerais:\n{estatisticas}")
 
     def criarTabelaDinamica(self, coluna_principal, colunas_operacoes=None):
         if colunas_operacoes:
