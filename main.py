@@ -1,10 +1,7 @@
 import sys
-import numpy as np  # Importe NumPy
-from datetime import datetime
 import pandas as pd
-from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, \
-    QWidget, QDockWidget, QTableWidget, QInputDialog, QTableWidgetItem, QLabel, QComboBox, QLayout
-
+from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, QWidget, QDockWidget, QTableWidget,QInputDialog, QTableWidgetItem, QMenuBar, QLabel, QComboBox
+from datetime import datetime
 
 class AnalisadorXLSX(QMainWindow):
     def __init__(self):
@@ -13,7 +10,7 @@ class AnalisadorXLSX(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("SDR - Smart Data Reader")
-        self.setGeometry(0, 0, 1000, 600)
+        self.setGeometry(100, 100, 800, 600)
 
         # Crie a barra de menu
         menubar = self.menuBar()
@@ -28,11 +25,6 @@ class AnalisadorXLSX(QMainWindow):
 
         # Crie o menu "Análise"
         analise_menu = menubar.addMenu("Análise")
-
-        # Opção para análise específica
-        analise_action = QAction("Análise Específica", self)
-        analise_action.triggered.connect(self.iniciarAnaliseEspecifica)
-        analise_menu.addAction(analise_action)
 
         # Crie um widget central para organizar a interface
         central_widget = QWidget(self)
@@ -79,15 +71,6 @@ class AnalisadorXLSX(QMainWindow):
         self.addDockWidget(1, self.dock_visualizacao)
         self.dock_visualizacao.hide()
 
-        # Crie um submenu "Preferências" em "Arquivo"
-        preferencias_submenu = arquivo_menu.addMenu("Preferências")
-
-        # Adicione uma ação para mostrar/ocultar logs
-        mostrar_logs_action = QAction("Mostrar/Esconder Logs", self)
-        mostrar_logs_action.setCheckable(True)
-        mostrar_logs_action.toggled.connect(self.toggleLogs)
-        preferencias_submenu.addAction(mostrar_logs_action)
-
         # Crie o menu "Exibir"
         exibir_menu = menubar.addMenu("Exibir")
 
@@ -100,28 +83,6 @@ class AnalisadorXLSX(QMainWindow):
         self.toggle_visualizacao_action = exibir_menu.addAction("Mostrar/Esconder Visualização de Dados")
         self.toggle_visualizacao_action.setCheckable(True)
         self.toggle_visualizacao_action.toggled.connect(self.toggleVisualizacao)
-
-        # Layout em grade para organizar a interface
-        layout = QVBoxLayout(central_widget)
-        central_widget.setLayout(layout)
-
-        # Widget para exibir as estatísticas
-        self.resumo_label = QLabel("Estatísticas Gerais:", self)
-        layout.addWidget(self.resumo_label)
-
-        # Área para exibir estatísticas gerais
-        self.textBrowser = QTextBrowser(self)
-        layout.addWidget(self.textBrowser)
-
-        # Widget para exibir informações gerais
-        self.informacoes_gerais_label = QLabel("Informações Gerais:", self)
-        layout.addWidget(self.informacoes_gerais_label)
-
-        # Define as informações gerais iniciais
-        self.informacoes_gerais_label.setText("Nenhum dado carregado.")
-
-        # DataFrame original
-        self.df_original = None
 
     def log(self, entry):
         # Registre uma entrada no widget de logs
@@ -143,10 +104,11 @@ class AnalisadorXLSX(QMainWindow):
             self.addLogEntry("Arquivo carregado com sucesso.")
             self.displayDataInTable()
 
-            # Atualize as informações gerais com as estatísticas
-            coluna_principal = self.coluna_principal_combobox.currentText()
-            estatisticas = self.calcularEstatisticas(coluna_principal)
-            self.informacoes_gerais_label.setText(estatisticas)
+        # Preencha os elementos de seleção de coluna com as colunas disponíveis
+        if self.df_original is not None:
+            self.coluna_principal_combobox.addItems(self.df_original.columns)
+            self.colunas_operacoes_combobox.addItems(self.df_original.columns)
+
     def addLogEntry(self, entry):
         # Adicione uma entrada ao widget de logs
         self.logs_widget.append(entry)
@@ -172,20 +134,6 @@ class AnalisadorXLSX(QMainWindow):
         else:
             self.dock_visualizacao.hide()
 
-    def calcularEstatisticas(self, coluna_principal):
-        if self.df_original is not None:
-            if coluna_principal in self.df_original.columns:
-                serie = self.df_original[coluna_principal]
-
-                media = np.mean(serie)
-                soma = np.sum(serie)
-                contagem = len(serie)
-
-                return f"Média: {media:.2f}, Soma: {soma}, Contagem: {contagem}"
-            else:
-                return "Coluna principal não encontrada nos dados."
-        else:
-            return "Nenhum dado carregado."
     def displayDataInTable(self):
         # Exiba os dados da planilha na tabela
         if self.df_original is not None:
@@ -211,13 +159,8 @@ class AnalisadorXLSX(QMainWindow):
         coluna_principal = self.coluna_principal_combobox.currentText()
         colunas_operacoes = self.colunas_operacoes_combobox.currentText()
 
-        self.log(
-            f"Iniciou análise com base na coluna principal: {coluna_principal} e coluna(s) de operações: {colunas_operacoes}")
+        self.log(f"Iniciou análise com base na coluna principal: {coluna_principal} e coluna(s) de operações: {colunas_operacoes}")
         self.criarTabelaDinamica(coluna_principal, colunas_operacoes)
-
-        # Atualize o resumo com as estatísticas
-        estatisticas = self.calcularEstatisticas(coluna_principal)
-        self.resumo_label.setText(f"Estatísticas Gerais:\n{estatisticas}")
 
     def criarTabelaDinamica(self, coluna_principal, colunas_operacoes=None):
         if colunas_operacoes:
