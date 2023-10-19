@@ -12,19 +12,34 @@ class AnalisadorXLSX(QMainWindow):
         self.setWindowTitle("SDR - Smart Data Reader")
         self.setGeometry(100, 100, 800, 600)
 
+        # ------------------>> Menu-superior - Organização-
+
         # Crie a barra de menu
         menubar = self.menuBar()
 
         # Crie o menu "Arquivo"
         arquivo_menu = menubar.addMenu("Arquivo")
 
+        # Crie o menu "Análise"
+        analise_menu = menubar.addMenu("Análise")
+
+        # Crie o menu "Apresenções"
+        slide_menu = menubar.addMenu("Apresentações")
+
+        # Crie o menu "Exibir"
+        exibir_menu = menubar.addMenu("Exibir")
+
+        # Crie o menu "Opções"
+        config_menu = menubar.addMenu("Opções")
+
+        #------------------> Função para importar os dados
+
         # Opção para importar arquivo XLSX
         importar_action = QAction("Importar Dados", self)
         importar_action.triggered.connect(self.abrirArquivo)
         arquivo_menu.addAction(importar_action)
 
-        # Crie o menu "Análise"
-        analise_menu = menubar.addMenu("Análise")
+        #-------------------> Criar Layout en Widget
 
         # Crie um widget central para organizar a interface
         central_widget = QWidget(self)
@@ -33,6 +48,8 @@ class AnalisadorXLSX(QMainWindow):
         # Layout em grade para organizar a interface
         layout = QVBoxLayout(central_widget)
         central_widget.setLayout(layout)
+
+        #--------------------> Montar relatórios
 
         # Área para exibir estatísticas gerais
         self.textBrowser = QTextBrowser(self)
@@ -55,6 +72,8 @@ class AnalisadorXLSX(QMainWindow):
         self.analise_button.clicked.connect(self.iniciarAnalise)
         layout.addWidget(self.analise_button)
 
+        # -----------------> Histório de Logs
+
         # Crie um dock widget para os logs
         self.dock_logs = QDockWidget("Histórico", self)
         self.logs_widget = QTextBrowser(self)
@@ -64,6 +83,8 @@ class AnalisadorXLSX(QMainWindow):
         self.log("Bem-vindo ao LID - Leitor Inteligente de Dados.")
         self.log("Ações do usuário registradas")
 
+        # ------------------- >>  Visualização de Dados
+
         # Crie um dock widget para a visualização de dados
         self.dock_visualizacao = QDockWidget("Visualização de Dados", self)
         self.visualizacao_widget = QTableWidget(self)
@@ -71,8 +92,8 @@ class AnalisadorXLSX(QMainWindow):
         self.addDockWidget(1, self.dock_visualizacao)
         self.dock_visualizacao.hide()
 
-        # Crie o menu "Exibir"
-        exibir_menu = menubar.addMenu("Exibir")
+
+        # -------------------- >> Menu de Exibição <<--------------------
 
         # Adicione a ação para mostrar/ocultar logs
         self.toggle_logs_action = exibir_menu.addAction("Mostrar/Esconder Logs")
@@ -83,6 +104,18 @@ class AnalisadorXLSX(QMainWindow):
         self.toggle_visualizacao_action = exibir_menu.addAction("Mostrar/Esconder Visualização de Dados")
         self.toggle_visualizacao_action.setCheckable(True)
         self.toggle_visualizacao_action.toggled.connect(self.toggleVisualizacao)
+
+        # Adicione ação para mostrar/ocultar estástisticas da planilha
+        self.toggle_status_action = exibir_menu.addAction("Mostrar/Esconder Estastíticas")
+        self.toggle_status_action.setCheckable(True)
+
+        # Adicione ação para mostrar/ocultar cabeçalho/menu-superiro
+        self.toggle_menu_sup_action = exibir_menu.addAction("Mostrar/Esconder Menu Superior")
+        self.toggle_menu_sup_action.setCheckable(True)
+
+        # Adicione ação para mostrar/ocultar descrição
+        self.toggle_description_action = exibir_menu.addAction("Mostrar/Esconder Descrição")
+        self.toggle_description_action.setCheckable(True)
 
     def log(self, entry):
         # Registre uma entrada no widget de logs
