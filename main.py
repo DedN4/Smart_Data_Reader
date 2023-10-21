@@ -3,6 +3,9 @@ import pandas as pd
 from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QPushButton, QFileDialog, QTextBrowser, QVBoxLayout, QWidget, QDockWidget, QTableWidget,QInputDialog, QTableWidgetItem, QMenuBar, QLabel, QComboBox
 from datetime import datetime
 
+# Importe a funcionalidade de filtragem avançada
+from functions.filtragem_avancada import FiltragemAvancada
+
 class AnalisadorXLSX(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -194,6 +197,17 @@ class AnalisadorXLSX(QMainWindow):
 
         self.log(f"Iniciou análise com base na coluna principal: {coluna_principal} e coluna(s) de operações: {colunas_operacoes}")
         self.criarTabelaDinamica(coluna_principal, colunas_operacoes)
+
+        # Adicione a ação para iniciar a filtragem avançada
+        filtragem_action = QAction("Filtragem Avançada", self)
+        filtragem_action.triggered.connect(self.iniciarFiltragemAvancada)
+        analise_menu.addAction(filtragem_action)
+
+
+    def iniciarFiltragemAvancada(self):
+        # Crie uma instância da janela de filtragem avançada
+        self.filtragem_avancada = FiltragemAvancada()
+        self.filtragem_avancada.exec_()  # Exibir a janela de filtragem avançada
 
     def criarTabelaDinamica(self, coluna_principal, colunas_operacoes=None):
         if colunas_operacoes:
