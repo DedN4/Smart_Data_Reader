@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
 import pandas as pd
+from city_clusters import city_to_cluster
 
 app = Flask(__name__)
 
@@ -22,7 +23,11 @@ def save_to_csv(data):
         # Se o arquivo não existir, crie um DataFrame vazio
         df = pd.DataFrame()
 
+    cidade = request.form["cidade"]
+    cluster = city_to_cluster.get(cidade, "Outro")  # Se a cidade não estiver no dicionário, o cluster será "Outro"
+
     # Adicione os dados com os cabeçalhos
+    data["Cluster"] = cluster  # Adiciona automaticamente o cluster com base na cidade
     df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
 
     # Salve o DataFrame de volta no CSV com cabeçalhos
@@ -34,7 +39,6 @@ def index():
         protocolo = request.form["protocolo"]
         data_encaixe = request.form["data_encaixe"]
         cidade = request.form["cidade"]
-        cluster = request.form["cluster"]
         periodo = request.form["periodo"]
         motivo = request.form["motivo"]
         gravidade = request.form["gravidade"]
@@ -43,7 +47,6 @@ def index():
             "Protocolo": [protocolo],
             "Data do Encaixe": [data_encaixe],
             "Cidade": [cidade],
-            "Cluster": [cluster],
             "Período": [periodo],
             "Motivo": [motivo],
             "Gravidade": [gravidade]
