@@ -10,16 +10,23 @@ datafile = "data.csv"
 # Verifica se o arquivo da planilha já existe
 if not os.path.isfile(datafile):
     # Se não existir, cria um DataFrame vazio e salva em um arquivo CSV
-    df = pd.DataFrame(columns=["Protocolo", "Data do Encaixe", "Cidade", "Cluster", "Período", "Motivo", "Gravidade"])
-    df.to_csv(datafile, index=False)
+    df = pd.DataFrame()
+    df.to_csv(datafile, index=False, header=["Protocolo", "Data do Encaixe", "Cidade", "Cluster", "Período", "Motivo", "Gravidade"])
 
 def save_to_csv(data):
-    # Lê os dados existentes do CSV
-    df = pd.read_csv(datafile)
-    # Concatena o novo DataFrame com os dados existentes
+    # Verifique se o arquivo CSV já existe
+    if os.path.isfile(datafile):
+        # Se o arquivo existir, leia-o
+        df = pd.read_csv(datafile, encoding='latin-1')
+    else:
+        # Se o arquivo não existir, crie um DataFrame vazio
+        df = pd.DataFrame()
+
+    # Adicione os dados com os cabeçalhos
     df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
-    # Salva o DataFrame de volta no CSV
-    df.to_csv(datafile, index=False)
+
+    # Salve o DataFrame de volta no CSV com cabeçalhos
+    df.to_csv(datafile, index=False, encoding='latin-1')
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -45,7 +52,7 @@ def index():
         save_to_csv(data)
 
     # Lê os dados do CSV para exibir na página
-    df = pd.read_csv(datafile)
+    df = pd.read_csv(datafile, encoding='latin-1')
     data = df.to_dict(orient="records")
 
     return render_template("index.html", data=data)
