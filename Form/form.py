@@ -16,8 +16,8 @@ if not os.path.isfile(datafile):
 def save_to_csv(data):
     # Lê os dados existentes do CSV
     df = pd.read_csv(datafile)
-    # Adiciona os novos dados ao DataFrame
-    df = df.append(data, ignore_index=True)
+    # Concatena o novo DataFrame com os dados existentes
+    df = pd.concat([df, pd.DataFrame(data)], ignore_index=True)
     # Salva o DataFrame de volta no CSV
     df.to_csv(datafile, index=False)
 
