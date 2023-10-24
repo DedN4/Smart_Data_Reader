@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulário</title>
+</head>
+<body>
+    <h1>Formulário</h1>
+    <form method="POST">
+        <label for="protocolo">Protocolo:</label>
+        <input type="text" name="protocolo" required><br><br>
+
+        <label for="data_encaixe">Data do Encaixe:</label>
+        <input type="date" name="data_encaixe" required><br><br>
+
+        <label for="cidade">Cidade:</label>
+        <input type="text" name="cidade" required><br><br>
+
+        <label for="cluster">Cluster:</label>
+        <select name="cluster" required>
+            <option value="Cluster 1">Cluster 1</option>
+            <option value="Cluster 2">Cluster 2</option>
+            <option value="Cluster 3">Cluster 3</option>
+            <option value="Cluster 4">Cluster 4</option>
+            <option value="Cluster 5">Cluster 5</option>
+        </select><br><br>
+
+        <label for="periodo">Período:</label>
+        <select name="periodo" required>
+            <option value="Manhã">Manhã</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Comercial">Comercial</option>
+        </select><br><br>
+
+        <label for="motivo">Motivo:</label>
+        <input type="text" name="motivo" required><br><br>
+
+        <label for="gravidade">Gravidade:</label>
+        <select name="gravidade" required>
+            <option value="Agendamento á Longo Prazo">Agendamento á Longo Prazo</option>
+            <option value="Sem Agenda">Sem Agenda</option>
+            <option value="Sem acesso">Sem acesso</option>
+            <option value="Quebra de Agenda">Quebra de Agenda</option>
+        </select><br><br>
+
+        <input type="submit" value="Enviar">
+    </form>
+    <h2>Dados Salvos:</h2>
+    <table border="1">
+        <tr>
+            <th>Protocolo</th>
+            <th>Data do Encaixe</th>
+            <th>Cidade</th>
+            <th>Cluster</th>
+            <th>Período</th>
+            <th>Motivo</th>
+            <th>Gravidade</th>
+        </tr>
+        {% for item in data %}
+            <tr>
+                <td>{{ item["Protocolo"] }}</td>
+                <td>{{ item["Data do Encaixe"] }}</td>
+                <td>{{ item["Cidade"] }}</td>
+                <td>{{ item["Cluster"] }}</td>
+                <td>{{ item["Período"] }}</td>
+                <td>{{ item["Motivo"] }}</td>
+                <td>{{ item["Gravidade"] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
